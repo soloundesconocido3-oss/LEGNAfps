@@ -1,53 +1,56 @@
 --// SERVICES
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local UIS = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
 local Stats = game:GetService("Stats")
 
 local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
 ---------------------------------------------------
--- 🌑 GUI BASE
+-- 📡 DEBUG SYSTEM
+local function log(msg)
+	print("[LEGNA DEBUG]: "..msg)
+	if console then
+		console.Text = console.Text .. "\n" .. msg
+	end
+end
+
+---------------------------------------------------
+-- 🧱 GUI SAFE START
 local gui = Instance.new("ScreenGui")
-gui.Name = "LEGNA_GOD_PANEL"
-gui.Parent = player:WaitForChild("PlayerGui")
+gui.Name = "LEGNA_STABLE_UI"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
 
-local bg = Instance.new("Frame", gui)
-bg.Size = UDim2.new(1,0,1,0)
-bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-bg.BackgroundTransparency = 0.6
+log("GUI created")
 
 ---------------------------------------------------
--- 🧱 MAIN
+-- 🌑 MAIN PANEL
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 600, 0, 360)
-main.Position = UDim2.new(0.5, -300, 0.5, -180)
-main.BackgroundColor3 = Color3.fromRGB(15,15,15)
+main.Size = UDim2.new(0, 520, 0, 320)
+main.Position = UDim2.new(0.5, -260, 0.5, -160)
+main.BackgroundColor3 = Color3.fromRGB(18,18,18)
 main.BorderSizePixel = 0
 
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 16)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 14)
 
-local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.fromRGB(255,60,60)
-stroke.Thickness = 1
-stroke.Transparency = 0.5
+log("Main panel loaded")
 
 ---------------------------------------------------
 -- 📌 SIDEBAR
 local sidebar = Instance.new("Frame", main)
-sidebar.Size = UDim2.new(0, 140, 1, -40)
-sidebar.Position = UDim2.new(0,0,0,40)
-sidebar.BackgroundColor3 = Color3.fromRGB(10,10,10)
-Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0,16)
+sidebar.Size = UDim2.new(0, 140, 1, 0)
+sidebar.BackgroundColor3 = Color3.fromRGB(12,12,12)
+
+Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0,14)
 
 ---------------------------------------------------
--- 📄 TOP BAR
+-- 📄 TITLE
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, -140, 0, 40)
+title.Size = UDim2.new(1,-140,0,35)
 title.Position = UDim2.new(0,140,0,0)
 title.BackgroundTransparency = 1
-title.Text = "LEGNA GOD PANEL"
+title.Text = "LEGNA DEBUG PANEL"
 title.TextColor3 = Color3.fromRGB(255,255,255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
@@ -55,10 +58,30 @@ title.TextSize = 14
 ---------------------------------------------------
 -- 📦 CONTENT
 local content = Instance.new("Frame", main)
-content.Size = UDim2.new(1,-150,1,-50)
-content.Position = UDim2.new(0,150,0,50)
+content.Size = UDim2.new(1,-150,1,-40)
+content.Position = UDim2.new(0,150,0,40)
 content.BackgroundTransparency = 1
 
+---------------------------------------------------
+-- 🧪 DEBUG CONSOLE UI
+local console = Instance.new("TextLabel", main)
+console.Size = UDim2.new(1,-150,0,80)
+console.Position = UDim2.new(0,150,1,-80)
+console.BackgroundColor3 = Color3.fromRGB(10,10,10)
+console.TextColor3 = Color3.fromRGB(0,255,120)
+console.Font = Enum.Font.Code
+console.TextSize = 12
+console.TextXAlignment = Enum.TextXAlignment.Left
+console.TextYAlignment = Enum.TextYAlignment.Top
+console.Text = "DEBUG CONSOLE:\n"
+console.ClipsDescendants = true
+
+Instance.new("UICorner", console).CornerRadius = UDim.new(0,10)
+
+log("Debug console ready")
+
+---------------------------------------------------
+-- 🧹 CLEAR UI
 local function clear()
 	for _,v in pairs(content:GetChildren()) do
 		if v:IsA("GuiObject") then v:Destroy() end
@@ -66,12 +89,12 @@ local function clear()
 end
 
 ---------------------------------------------------
--- 🔘 BUTTON SYSTEM
+-- 🔘 SAFE BUTTON
 local function button(text, y, callback)
 	local b = Instance.new("TextButton", content)
 	b.Size = UDim2.new(1,-10,0,40)
 	b.Position = UDim2.new(0,5,0,y)
-	b.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	b.BackgroundColor3 = Color3.fromRGB(25,25,25)
 	b.Text = text
 	b.TextColor3 = Color3.fromRGB(220,220,220)
 	b.Font = Enum.Font.Gotham
@@ -79,98 +102,36 @@ local function button(text, y, callback)
 
 	Instance.new("UICorner", b).CornerRadius = UDim.new(0,10)
 
-	local s = Instance.new("UIStroke", b)
-	s.Color = Color3.fromRGB(255,60,60)
-	s.Transparency = 0.7
+	b.MouseButton1Click:Connect(function()
+		log("Button pressed: "..text)
 
-	b.MouseEnter:Connect(function()
-		TweenService:Create(s, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
+		local ok, err = pcall(callback)
+		if not ok then
+			log("ERROR: "..tostring(err))
+		end
 	end)
-
-	b.MouseLeave:Connect(function()
-		TweenService:Create(s, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
-	end)
-
-	b.MouseButton1Click:Connect(callback)
 end
 
 ---------------------------------------------------
--- 📊 SERVER TAB
+-- 📊 SERVER TAB (SAFE)
 local function openServer()
 	clear()
+	log("Opening server tab")
 
 	local ping = "N/A"
+
 	pcall(function()
-		ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue()).." ms"
-	end)
-
-	button("Players: "..#Players:GetPlayers(), 0)
-	button("Ping: "..ping, 50)
-	button("PlaceId: "..game.PlaceId, 100)
-
-	local job = Instance.new("TextBox", content)
-	job.Size = UDim2.new(1,-10,0,40)
-	job.Position = UDim2.new(0,5,0,160)
-	job.Text = game.JobId
-	job.BackgroundColor3 = Color3.fromRGB(20,20,20)
-	job.TextColor3 = Color3.fromRGB(255,255,255)
-	job.ClearTextOnFocus = false
-
-	Instance.new("UICorner", job).CornerRadius = UDim.new(0,10)
-
-	button("Copy JobId", 210, function()
-		setclipboard(game.JobId)
-	end)
-end
-
----------------------------------------------------
--- 🚀 BOOST SYSTEM (INTELLIGENT)
-local boostEnabled = false
-
-local function applyBoost(state)
-	if state then
-		-- Low graphics
-		for _,v in pairs(workspace:GetDescendants()) do
-			if v:IsA("BasePart") then
-				v.Material = Enum.Material.SmoothPlastic
-				v.Reflectance = 0
-				v.CastShadow = false
-			end
+		local item = Stats.Network.ServerStatsItem["Data Ping"]
+		if item then
+			ping = math.floor(item:GetValue()).." ms"
 		end
-
-		Lighting.GlobalShadows = false
-		settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-	else
-		Lighting.GlobalShadows = true
-	end
-end
-
-local function openBoost()
-	clear()
-
-	button("FPS BOOST (Toggle)", 0, function()
-		boostEnabled = not boostEnabled
-		applyBoost(boostEnabled)
 	end)
 
-	button("REMOVE SHADOWS", 50, function()
-		Lighting.GlobalShadows = false
-	end)
+	button("Players: "..#Players:GetPlayers(), 0, function() end)
+	button("Ping: "..ping, 50, function() end)
+	button("PlaceId: "..game.PlaceId, 100, function() end)
 
-	button("LOW GRAPHICS MODE", 100, function()
-		settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-	end)
-
-	button("RESET VISUALS", 150, function()
-		for _,v in pairs(workspace:GetDescendants()) do
-			if v:IsA("BasePart") then
-				v.Material = Enum.Material.Plastic
-			end
-		end
-
-		Lighting.GlobalShadows = true
-		settings().Rendering.QualityLevel = Enum.QualityLevel.Automatic
-	end)
+	log("Server info loaded")
 end
 
 ---------------------------------------------------
@@ -186,18 +147,29 @@ local function tab(name, y, callback)
 	t.TextSize = 13
 
 	t.MouseButton1Click:Connect(function()
+		log("Tab selected: "..name)
 		clear()
 		callback()
 	end)
 end
 
 tab("Server", 20, openServer)
-tab("Boost", 70, openBoost)
-tab("General", 120, function()
+tab("Debug", 70, function()
 	clear()
-	button("UI Loaded", 0)
+	log("Debug tab opened")
+
+	button("Test Error", 0, function()
+		error("Test error triggered")
+	end)
+
+	button("Print Ping", 50, function()
+		log("Ping checked manually")
+	end)
 end)
 
 ---------------------------------------------------
--- 🚀 DEFAULT
-openServer()
+-- 🚀 START SAFE
+pcall(function()
+	openServer()
+	log("UI fully loaded")
+end)
