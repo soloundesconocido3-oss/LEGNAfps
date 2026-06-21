@@ -12,19 +12,19 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 180, 0, 36)
-Frame.Position = UDim2.new(0.02, 0, 0.15, 0)
+Frame.Size = UDim2.new(0, 145, 0, 28)
+Frame.Position = UDim2.new(0.01, 0, 0.12, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BackgroundTransparency = 0.15
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 
 local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0, 10)
+Corner.CornerRadius = UDim.new(0, 8)
 Corner.Parent = Frame
 
 local Stroke = Instance.new("UIStroke")
-Stroke.Thickness = 1.5
+Stroke.Thickness = 1
 Stroke.Color = Color3.fromRGB(25, 25, 25)
 Stroke.Parent = Frame
 
@@ -33,8 +33,10 @@ Label.Size = UDim2.fromScale(1, 1)
 Label.BackgroundTransparency = 1
 Label.RichText = true
 Label.Font = Enum.Font.GothamBold
-Label.TextSize = 18
+Label.TextSize = 14
 Label.TextColor3 = Color3.new(1,1,1)
+Label.TextXAlignment = Enum.TextXAlignment.Center
+Label.TextYAlignment = Enum.TextYAlignment.Center
 Label.Parent = Frame
 
 -- Drag móvil y PC
@@ -113,7 +115,7 @@ task.spawn(function()
 	end
 end)
 
--- Actualizar texto constantemente para que el RGB sea fluido
+-- Actualizar texto
 RunService.RenderStepped:Connect(function()
 
 	local Ping = math.floor(
